@@ -64,18 +64,6 @@ def resolve_uri(uri):
         return content, mimetype
     else:
         return response_not_found()
-    #is it a file?
-    #    os.path.isfile(uri)
-    #    body = open(uri), read as binary
-    # elif  os.path.isdir(uri) ...? list the contents? 
-    # else  [nada] return 404 -  response_not_found()
-
-    #fol, fil = os.path.split(uri)
-    #fil = uri.split('/')[-1] #file
-    #fol = '{}/'.format(os.path.dirname(uri))
-    #print (body, mimetype)
-
-    #return body, bytes(mimetype,'utf-8')
 
 def server(log_buffer=sys.stderr):
     address = ('127.0.0.1', 10000)
