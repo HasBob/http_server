@@ -1,0 +1,246 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.5.1, pytest-2.8.5, py-1.4.31, pluggy-0.3.1
+rootdir: /Users/bob/python/cpe200/session02-hw, inifile: 
+collected 23 items
+
+tests.py .............FFFF.F.FFF
+
+=================================== FAILURES ===================================
+__________________ ResolveURITestCase.test_directory_resource __________________
+
+self = <tests.ResolveURITestCase testMethod=test_directory_resource>
+
+    def test_directory_resource(self):
+        uri = '/'
+        expected_names = [
+            'a_web_page.html', 'images', 'make_time.py', 'sample.txt',
+        ]
+        expected_mimetype = "text/plain"
+        actual_body, actual_mimetype = self.call_function_under_test(uri)
+        self.assertEqual(
+            expected_mimetype,
+            actual_mimetype,
+            'expected {0} got {1}'.format(expected_mimetype, actual_mimetype)
+        )
+        actual_body = actual_body.decode('utf8')
+        for expected in expected_names:
+            self.assertTrue(
+                expected in actual_body,
+>               '"{0}" not in "{1}"'.format(expected, actual_body)
+            )
+E           AssertionError: False is not true : "a_web_page.html" not in "HTTP/1.1 404 Not Found
+E           "
+
+tests.py:222: AssertionError
+____________________ ResolveURITestCase.test_file_resource _____________________
+
+self = <tests.ResolveURITestCase testMethod=test_file_resource>
+
+    def test_file_resource(self):
+        uris_types = {
+            '/a_web_page.html': 'text/html',
+            '/make_time.py': 'text/x-python',
+            '/sample.txt': 'text/plain',
+        }
+        for uri, expected_mimetype in uris_types.items():
+            path = pathlib.Path("webroot{0}".format(uri))
+            expected_body = path.read_bytes()
+            actual_body, actual_mimetype = self.call_function_under_test(uri)
+            self.assertEqual(
+                expected_mimetype,
+                actual_mimetype,
+                'expected {0} got {1}'.format(
+>                   expected_mimetype, actual_mimetype
+                )
+            )
+E           AssertionError: 'text/html' != 'text/plain'
+E           - text/html
+E           + text/plain
+E            : expected text/html got text/plain
+
+tests.py:239: AssertionError
+____________________ ResolveURITestCase.test_image_resource ____________________
+
+self = <tests.ResolveURITestCase testMethod=test_image_resource>
+
+    def test_image_resource(self):
+        names_types = {
+            'JPEG_example.jpg': 'image/jpeg',
+            'sample_1.png': 'image/png',
+        }
+        for filename, expected_mimetype in names_types.items():
+            uri = "/images/{0}".format(filename)
+            path = pathlib.Path("webroot{0}".format(uri))
+            expected_body = path.read_bytes()
+            actual_body, actual_mimetype = self.call_function_under_test(uri)
+            self.assertEqual(
+                expected_mimetype,
+                actual_mimetype,
+                'expected {0} got {1}'.format(
+>                   expected_mimetype, actual_mimetype
+                )
+            )
+E           AssertionError: 'image/png' != 'text/plain'
+E           - image/png
+E           + text/plain
+E            : expected image/png got text/plain
+
+tests.py:264: AssertionError
+___________________ ResolveURITestCase.test_missing_resource ___________________
+
+self = <tests.ResolveURITestCase testMethod=test_missing_resource>
+
+    def test_missing_resource(self):
+        uri = "/missing.html"
+>       self.assertRaises(NameError, self.call_function_under_test, uri)
+E       AssertionError: NameError not raised by call_function_under_test
+
+tests.py:277: AssertionError
+______________ HTTPServerFunctionalTestCase.test_missing_resource ______________
+
+self = <tests.HTTPServerFunctionalTestCase testMethod=test_missing_resource>
+
+    def test_missing_resource(self):
+        message = CRLF.join(
+            ['GET /missing.html HTTP/1.1', 'Host: example.com', '']
+        )
+        expected = '404 Not Found'
+        actual = self.send_message(message)
+        self.assertTrue(
+>           expected in actual, '"{0}" not in "{1}"'.format(expected, actual)
+        )
+E       AssertionError: False is not true : "404 Not Found" not in "HTTP/1.1 200 OK
+E       Content-Type: text/plain
+E       
+E       this is a pretty minimal response"
+
+tests.py:422: AssertionError
+----------------------------- Captured stderr call -----------------------------
+connecting to localhost port 10000
+sending "GET /missing.html HTTP/1.1
+Host: example.com
+"
+received "b'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nthis is a pretty minimal response'"
+closing socket
+________ HTTPServerFunctionalTestCase.test_webroot_directory_resources _________
+
+self = <tests.HTTPServerFunctionalTestCase testMethod=test_webroot_directory_resources>
+
+    def test_webroot_directory_resources(self):
+        """verify that directory uris are properly served"""
+        message_tmpl = CRLF.join(['GET {0} HTTP/1.1', 'Host: example.com', ''])
+        root = "webroot"
+        for directory, directories, files in os.walk(root):
+            directory_uri = "/{0}".format(directory[len(root):])
+            message = message_tmpl.format(directory_uri)
+            actual = self.send_message(message)
+            # verify that directory listings are correct
+            self.assertTrue(
+                "200 OK" in actual,
+                "request for {0} did not result in OK".format(directory_uri))
+            for expected in directories + files:
+                self.assertTrue(
+                    expected in actual,
+>                   '"{0}" not in "{1}"'.format(expected, actual)
+                )
+E               AssertionError: False is not true : "images" not in "HTTP/1.1 200 OK
+E               Content-Type: text/plain
+E               
+E               this is a pretty minimal response"
+
+tests.py:339: AssertionError
+----------------------------- Captured stderr call -----------------------------
+connecting to localhost port 10000
+sending "GET / HTTP/1.1
+Host: example.com
+"
+received "b'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nthis is a pretty minimal response'"
+closing socket
+_____________ HTTPServerFunctionalTestCase.test_webroot_file_uris ______________
+
+self = <tests.HTTPServerFunctionalTestCase testMethod=test_webroot_file_uris>
+
+    def test_webroot_file_uris(self):
+        """verify that file uris are properly served"""
+        message_tmpl = CRLF.join(['GET {0} HTTP/1.1', 'Host: example.com', ''])
+        root = pathlib.Path("webroot")
+        for file_path in root.iterdir():
+            # set up expectations for this file
+            if file_path.is_dir():
+                continue
+            expected_body = file_path.read_bytes().decode('utf8')
+            expected_mimetype = mimetypes.types_map[
+                os.path.splitext(str(file_path))[1]
+            ]
+            file_uri = str(file_path)[len(str(root)):]
+            message = message_tmpl.format(file_uri)
+            actual = self.send_message(message)
+            self.assertTrue(
+                "200 OK" in actual,
+                "request for {0} did not result in OK".format(
+                    file_uri
+                )
+            )
+            self.assertTrue(
+                expected_mimetype in actual,
+                "mimetype {0} not in response for {1}".format(
+>                   expected_mimetype, file_uri
+                )
+            )
+E           AssertionError: False is not true : mimetype text/html not in response for /a_web_page.html
+
+tests.py:366: AssertionError
+----------------------------- Captured stderr call -----------------------------
+connecting to localhost port 10000
+sending "GET /a_web_page.html HTTP/1.1
+Host: example.com
+"
+received "b'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nthis is a pretty minimal response'"
+closing socket
+_____________ HTTPServerFunctionalTestCase.test_webroot_image_uris _____________
+
+self = <tests.HTTPServerFunctionalTestCase testMethod=test_webroot_image_uris>
+
+    def test_webroot_image_uris(self):
+        """verify that image uris are properly served
+    
+            requires using a client that does not attempt to decode the response
+            body
+            """
+        message_tmpl = CRLF.join(['GET {0} HTTP/1.1', 'Host: example.com', ''])
+        root = pathlib.Path("webroot")
+        images_path = root / 'images'
+        for file_path in images_path.iterdir():
+            # set up expectations for this file
+            if file_path.is_dir():
+                continue
+            expected_body = file_path.read_bytes()
+            expected_mimetype = mimetypes.types_map[
+                os.path.splitext(str(file_path))[1]
+            ]
+            file_uri = str(file_path)[len(str(root)):]
+            message = message_tmpl.format(file_uri)
+            actual = self.send_message(message, use_bytes=True)
+            self.assertTrue(
+                b"200 OK" in actual,
+                "request for {0} did not result in OK".format(
+                    file_uri
+                )
+            )
+            self.assertTrue(
+                expected_mimetype.encode('utf8') in actual,
+                "mimetype {0} not in response for {1}".format(
+>                   expected_mimetype, file_uri
+                )
+            )
+E           AssertionError: False is not true : mimetype image/jpeg not in response for /images/JPEG_example.jpg
+
+tests.py:405: AssertionError
+----------------------------- Captured stderr call -----------------------------
+connecting to localhost port 10000
+sending "GET /images/JPEG_example.jpg HTTP/1.1
+Host: example.com
+"
+received "b'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nthis is a pretty minimal response'"
+closing socket
+===================== 8 failed, 15 passed in 0.15 seconds ======================
