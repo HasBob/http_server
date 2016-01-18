@@ -46,22 +46,24 @@ def parse_request(request):
 def resolve_uri(uri):
     """This method should return appropriate content and a mime type"""
     #mimetype = ('Content-Type: {}'.format(mimetypes.guess_type(uri)[0]))
-    # home = __file__
-    #mimetype = mimetypes.guess_type(uri)[0]
     mimetype = mimetypes.guess_type(uri)[0]
+    uripath = '{}/'.format(os.path.dirname(__file__)) + 'webroot' + os.path.dirname(uri)
+    fil = uri.split('/')[-1]
 
     #if not mimetype:
     #    return response_not_found()
     # 
-    if os.path.isfile(uri):
-        content = open(uri, 'rb').read()
+    #import pdb; pdb.set_trace()
+    if os.path.isfile(uripath + uri): 
+        #import pdb; pdb.set_trace()
+        content = open(uripath + fil, 'rb').read()
         return content, bytes(mimetype,'utf-8')
-    #elif os.path.isdir(uri):
-    #    content = os.listdir(uri)
-    #    mimetype = 'text/plain'
-    #    return content, mimetype
+    elif os.path.isdir(uri):
+        content = ('\n'.join(os.listdir(uripath))).encode('utf8')
+        mimetype = b'text/plain'
+        return content, mimetype
     else:
-        return (response_not_found(), b'text/plain')
+        return response_not_found()
     #is it a file?
     #    os.path.isfile(uri)
     #    body = open(uri), read as binary
@@ -73,13 +75,12 @@ def resolve_uri(uri):
     #fol = '{}/'.format(os.path.dirname(uri))
     #print (body, mimetype)
 
-    return body, bytes(mimetype,'utf-8')
+    #return body, bytes(mimetype,'utf-8')
 
 def server(log_buffer=sys.stderr):
     address = ('127.0.0.1', 10000)
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    #print(__file__)
     print("making a server on {0}:{1}".format(*address), file=log_buffer)
     sock.bind(address)
     sock.listen(1)

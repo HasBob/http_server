@@ -28,8 +28,7 @@ self = <tests.ResolveURITestCase testMethod=test_directory_resource>
                 expected in actual_body,
 >               '"{0}" not in "{1}"'.format(expected, actual_body)
             )
-E           AssertionError: False is not true : "a_web_page.html" not in "HTTP/1.1 404 Not Found
-E           "
+E           AssertionError: False is not true : "a_web_page.html" not in ".cacheContents: .gitContents: __pycache__Contents: http_server-hw.pyContents: http_server.pyContents: output-tests.py-2016-01-18-1331.logContents: simple_client.pyContents: tests.pyContents: webroot"
 
 tests.py:222: AssertionError
 ____________________ ResolveURITestCase.test_file_resource _____________________
@@ -45,20 +44,21 @@ self = <tests.ResolveURITestCase testMethod=test_file_resource>
         for uri, expected_mimetype in uris_types.items():
             path = pathlib.Path("webroot{0}".format(uri))
             expected_body = path.read_bytes()
-            actual_body, actual_mimetype = self.call_function_under_test(uri)
-            self.assertEqual(
-                expected_mimetype,
-                actual_mimetype,
-                'expected {0} got {1}'.format(
->                   expected_mimetype, actual_mimetype
-                )
-            )
-E           AssertionError: 'text/html' != 'text/plain'
-E           - text/html
-E           + text/plain
-E            : expected text/html got text/plain
+>           actual_body, actual_mimetype = self.call_function_under_test(uri)
 
-tests.py:239: AssertionError
+tests.py:234: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ResolveURITestCase testMethod=test_file_resource>
+uri = '/a_web_page.html'
+
+    def call_function_under_test(self, uri):
+        """call the resolve_uri function"""
+        from http_server import resolve_uri
+>       content, mime_type = resolve_uri(uri)
+E       ValueError: too many values to unpack (expected 2)
+
+tests.py:203: ValueError
 ____________________ ResolveURITestCase.test_image_resource ____________________
 
 self = <tests.ResolveURITestCase testMethod=test_image_resource>
@@ -72,20 +72,21 @@ self = <tests.ResolveURITestCase testMethod=test_image_resource>
             uri = "/images/{0}".format(filename)
             path = pathlib.Path("webroot{0}".format(uri))
             expected_body = path.read_bytes()
-            actual_body, actual_mimetype = self.call_function_under_test(uri)
-            self.assertEqual(
-                expected_mimetype,
-                actual_mimetype,
-                'expected {0} got {1}'.format(
->                   expected_mimetype, actual_mimetype
-                )
-            )
-E           AssertionError: 'image/png' != 'text/plain'
-E           - image/png
-E           + text/plain
-E            : expected image/png got text/plain
+>           actual_body, actual_mimetype = self.call_function_under_test(uri)
 
-tests.py:264: AssertionError
+tests.py:259: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.ResolveURITestCase testMethod=test_image_resource>
+uri = '/images/JPEG_example.jpg'
+
+    def call_function_under_test(self, uri):
+        """call the resolve_uri function"""
+        from http_server import resolve_uri
+>       content, mime_type = resolve_uri(uri)
+E       ValueError: too many values to unpack (expected 2)
+
+tests.py:203: ValueError
 ___________________ ResolveURITestCase.test_missing_resource ___________________
 
 self = <tests.ResolveURITestCase testMethod=test_missing_resource>
@@ -93,9 +94,17 @@ self = <tests.ResolveURITestCase testMethod=test_missing_resource>
     def test_missing_resource(self):
         uri = "/missing.html"
 >       self.assertRaises(NameError, self.call_function_under_test, uri)
-E       AssertionError: NameError not raised by call_function_under_test
 
-tests.py:277: AssertionError
+tests.py:277: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def call_function_under_test(self, uri):
+        """call the resolve_uri function"""
+        from http_server import resolve_uri
+>       content, mime_type = resolve_uri(uri)
+E       ValueError: too many values to unpack (expected 2)
+
+tests.py:203: ValueError
 ______________ HTTPServerFunctionalTestCase.test_missing_resource ______________
 
 self = <tests.HTTPServerFunctionalTestCase testMethod=test_missing_resource>
@@ -243,4 +252,4 @@ Host: example.com
 "
 received "b'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nthis is a pretty minimal response'"
 closing socket
-===================== 8 failed, 15 passed in 0.15 seconds ======================
+===================== 8 failed, 15 passed in 0.16 seconds ======================
