@@ -252,6 +252,7 @@ class ResolveURITestCase(unittest.TestCase):
             'JPEG_example.jpg': 'image/jpeg',
             'sample_1.png': 'image/png',
         }
+        #import pdb; pdb.set_trace()
         for filename, expected_mimetype in names_types.items():
             uri = "/images/{0}".format(filename)
             path = pathlib.Path("webroot{0}".format(uri))

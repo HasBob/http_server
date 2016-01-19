@@ -54,16 +54,16 @@ def resolve_uri(uri):
     #    return response_not_found()
     # 
     #import pdb; pdb.set_trace()
-    if os.path.isfile(uripath + uri): 
+    if os.path.isfile(uripath + fil): 
         #import pdb; pdb.set_trace()
         content = open(uripath + fil, 'rb').read()
         return content, bytes(mimetype,'utf-8')
-    elif os.path.isdir(uri):
-        content = ('\n'.join(os.listdir(uripath))).encode('utf8')
+    elif os.path.isdir(uripath + fil):
+        content = ('\n'.join(os.listdir(uripath)))#.encode('utf8')
         mimetype = b'text/plain'
-        return content, mimetype
+        return bytes(content,'utf8'), mimetype
     else:
-        return response_not_found()
+        raise NameError(response_not_found())
 
 def server(log_buffer=sys.stderr):
     address = ('127.0.0.1', 10000)
