@@ -47,7 +47,7 @@ def resolve_uri(uri):
     """This method should return appropriate content and a mime type"""
     #mimetype = ('Content-Type: {}'.format(mimetypes.guess_type(uri)[0]))
     mimetype = mimetypes.guess_type(uri)[0]
-    uripath = '{}/'.format(os.path.dirname(__file__)) + 'webroot' + os.path.dirname(uri)
+    uripath = '{}/'.format(os.path.dirname(__file__)) + 'webroot' + os.path.dirname(uri) + '/'
     fil = uri.split('/')[-1]
 
     #if not mimetype:
@@ -59,7 +59,7 @@ def resolve_uri(uri):
         content = open(uripath + fil, 'rb').read()
         return content, bytes(mimetype,'utf-8')
     elif os.path.isdir(uripath + fil):
-        content = ('\n'.join(os.listdir(uripath)))#.encode('utf8')
+        content = ('\r\n'.join(os.listdir(uripath)))#.encode('utf8')
         mimetype = b'text/plain'
         return bytes(content,'utf8'), mimetype
     else:

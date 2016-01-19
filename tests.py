@@ -252,7 +252,6 @@ class ResolveURITestCase(unittest.TestCase):
             'JPEG_example.jpg': 'image/jpeg',
             'sample_1.png': 'image/png',
         }
-        #import pdb; pdb.set_trace()
         for filename, expected_mimetype in names_types.items():
             uri = "/images/{0}".format(filename)
             path = pathlib.Path("webroot{0}".format(uri))
@@ -324,6 +323,7 @@ class HTTPServerFunctionalTestCase(unittest.TestCase):
 
     def test_webroot_directory_resources(self):
         """verify that directory uris are properly served"""
+        import pdb; pdb.set_trace()
         message_tmpl = CRLF.join(['GET {0} HTTP/1.1', 'Host: example.com', ''])
         root = "webroot"
         for directory, directories, files in os.walk(root):
